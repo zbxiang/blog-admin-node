@@ -13,9 +13,7 @@ router.post('/create',function(req, res, next) {
         req.body.username = decode.username
     }
     let categoryText = req.body.categoryText
-    blogService.setCategory(categoryText).then(() => {
-        return blogService.getCategory(categoryText)
-    }).then((categoryList) => {
+    blogService.setCategory(categoryText).then((categoryList) => {
         return {
             category: categoryList[0].value,
             categoryText: categoryList[0].label
@@ -23,11 +21,15 @@ router.post('/create',function(req, res, next) {
     }).then((data) => {
         const blogData = Object.assign(data, req.body)
         return new Blog(blogData)
+    }).then((data) => {
+        const blogData = Object.assign(data, req.body)
+        return new Blog(blogData)
     }).then((blog) => {
         return blogService.insertBlog(blog)
-    }).then(() => {
+    }).then((result) => {
         new Result('添加博客成功').success(res)
-    }).catch(err => {
+    })
+    .catch(err => {
         next(boom.badImplementation(err))
     })
 })
@@ -38,9 +40,7 @@ router.post('/update', function(req, res, next) {
         req.body.username = decode.username
     }
     let categoryText = req.body.categoryText
-    blogService.getCategory(categoryText).then(() => {
-        return blogService.getCategory(categoryText)
-    }).then((categoryList) => {
+    blogService.setCategory(categoryText).then((categoryList) => {
         return {
             category: categoryList[0].value,
             categoryText: categoryList[0].label
@@ -55,7 +55,8 @@ router.post('/update', function(req, res, next) {
         return blogService.updateBlog(blog)
     }).then((result) => {
         new Result('更新博客成功').success(res)
-    }).catch(err => {
+    })
+    .catch(err => {
         next(boom.badImplementation(err))
     })
 })

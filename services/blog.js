@@ -65,16 +65,24 @@ async function setCategory(categoryText) {
             if (categoryText) {
                 function isCategory() {
                     const sql = `select * from category_list where categoryText='${categoryText}'`
-                    return db.queryOne(sql)
+                    return db.querySql(sql)
                 }
-                const result = await isCategory()
-                if (result) {
-                    reject(new Error('添加的分类已存在'))
-                } else {
+                let result = await isCategory()
+                if (!result.length > 0) {
                     sql = `INSERT INTO category_list (category, categoryText) VALUES (null, '${categoryText}')`
                     await db.querySql(sql)
-                    resolve()
                 }
+                result = await isCategory()
+                const categoryList = []
+                result.forEach(item => {
+                    categoryList.push({
+                        label: item.categoryText,
+                        value: item.category,
+                    })
+                })
+                resolve(categoryList)
+            } else {
+                reject(e)
             }
         } catch (e) {
             reject(e)
@@ -82,8 +90,8 @@ async function setCategory(categoryText) {
     })
 }
 
-async function getCategory(categoryText) {
-    const sql = categoryText ? `select * from category_list where categoryText='${categoryText}'` : `select * from category`
+async function getCategory() {
+    const sql = `select * from category`
     const result = await db.querySql(sql)
     const categoryList = []
     result.forEach(item => {
