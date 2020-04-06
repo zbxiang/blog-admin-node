@@ -1,2 +1,1 @@
-# blog-admin-node
-博客后台 API
+# node-server-template
